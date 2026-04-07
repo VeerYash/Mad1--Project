@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% block title %}Register — PlacementHub{% endblock %}
+
+{% block auth_content %}
+<div class="auth-page" style="padding: 40px 0;">
+  <div class="auth-card" style="max-width:520px;">
+    <div class="auth-logo">🎓 PlacementHub</div>
+    <p class="auth-sub">Create your account</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ 'danger' if category=='danger' else ('warning' if category=='warning' else ('success' if category=='success' else 'info')) }} alert-dismissible fade show mb-3" role="alert">
+          {{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    {% endwith %}
+
+    <!-- Role toggle -->
+    <div class="mb-4">
+      <label class="form-label fw-600">I am registering as</label>
+      <div class="d-flex gap-2">
+        <button type="button" class="btn btn-primary flex-fill role-btn" data-role="student" id="btn-student">
+          <i class="bi bi-mortarboard me-1"></i> Student
+        </button>
+        <button type="button" class="btn btn-outline-primary flex-fill role-btn" data-role="company" id="btn-company">
+          <i class="bi bi-building me-1"></i> Company
+        </button>
+      </div>
+    </div>
+
+    <form method="POST" action="{{ url_for('register') }}" id="reg-form">
+      <input type="hidden" name="role" id="role-input" value="student"/>
+
+      <!-- Common fields -->
+      <div class="mb-3">
+        <label class="form-label fw-600" id="name-label">Full Name</label>
+        <input type="text" name="name" class="form-control" required/>
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-600">Email address</label>
+        <input type="email" name="email" class="form-control" required/>
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-600">Password</label>
+        <input type="password" name="password" class="form-control" required/>
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-600">Confirm Password</label>
+        <input type="password" name="confirm_password" class="form-control" required/>
+      </div>
+
+      <!-- Student-only fields -->
+      <div id="student-fields">
+        <div class="row g-3 mb-3">
+          <div class="col-6">
+            <label class="form-label fw-600">Age</label>
+            <input type="number" name="age" class="form-control" min="16" max="40"/>
+          </div>
+          <div class="col-6">
+            <label class="form-label fw-600">CGPA</label>
+            <input type="number" name="cgpa" class="form-control" step="0.01" min="0" max="10"/>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-600">Department</label>
+          <input type="text" name="department" class="form-control" placeholder="e.g. Computer Science"/>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-600">Contact Info</label>
+          <input type="text" name="contact_info" class="form-control" placeholder="Phone number"/>
+        </div>
+      </div>
+
+      <!-- Company-only fields -->
+      <div id="company-fields" style="display:none;">
+        <div class="mb-3">
+          <label class="form-label fw-600">Company Name</label>
+          <input type="text" name="company_name" class="form-control"/>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-600">HR Contact</label>
+          <input type="text" name="hr_contact" class="form-control" placeholder="HR email or phone"/>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-600">Website</label>
+          <input type="url" name="website" class="form-control" placeholder="https://company.com"/>
+        </div>
+        <div class="alert alert-warning py-2" style="font-size:.85rem;">
+          <i class="bi bi-info-circle me-1"></i>
+          Your registration will be reviewed by admin before you can log in.
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100 py-2 fw-600 mt-2">Create Account</button>
+    </form>
+
+    <hr class="my-4"/>
+    <p class="text-center text-muted" style="font-size:.875rem;">
+      Already have an account? <a href="{{ url_for('login') }}" class="text-decoration-none fw-600">Sign in</a>
+    </p>
+  </div>
+</div>
+
+<script>
+  const btnStudent = document.getElementById('btn-student');
+  const btnCompany = document.getElementById('btn-company');
+  const roleInput  = document.getElementById('role-input');
+  const studentFields = document.getElementById('student-fields');
+  const companyFields = document.getElementById('company-fields');
+
+  function setRole(role) {
+    roleInput.value = role;
+    if (role === 'student') {
+      btnStudent.classList.replace('btn-outline-primary','btn-primary');
+      btnCompany.classList.replace('btn-primary','btn-outline-primary');
+      studentFields.style.display = '';
+      companyFields.style.display = 'none';
+    } else {
+      btnCompany.classList.replace('btn-outline-primary','btn-primary');
+      btnStudent.classList.replace('btn-primary','btn-outline-primary');
+      companyFields.style.display = '';
+      studentFields.style.display = 'none';
+    }
+  }
+  btnStudent.addEventListener('click', () => setRole('student'));
+  btnCompany.addEventListener('click', () => setRole('company'));
+</script>
+{% endblock %}

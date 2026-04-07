@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block title %}Company Dashboard — PlacementHub{% endblock %}
+{% block page_title %}Company Dashboard{% endblock %}
+
+{% block nav_links %}
+<a href="{{ url_for('company_dashboard') }}" class="active"><i class="bi bi-speedometer2"></i> Dashboard</a>
+<div class="nav-sep"></div>
+<a href="{{ url_for('company_create_drive') }}"><i class="bi bi-plus-circle"></i> Create Drive</a>
+<a href="{{ url_for('company_drives') }}"><i class="bi bi-briefcase"></i> My Drives</a>
+{% endblock %}
+
+{% block content %}
+<div class="card mb-4" style="border-left:4px solid var(--primary);background:linear-gradient(135deg,#eff6ff,#fff);">
+  <div class="card-body px-4 py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div>
+      <h5 class="mb-1 fw-bold" style="font-family:'Syne',sans-serif;">{{ company.company_name }}</h5>
+      <div class="text-muted" style="font-size:.85rem;">
+        {% if company.website %}<a href="{{ company.website }}" target="_blank" class="me-3 text-decoration-none"><i class="bi bi-globe me-1"></i>{{ company.website }}</a>{% endif %}
+        {% if company.hr_contact %}<span><i class="bi bi-person-lines-fill me-1"></i>{{ company.hr_contact }}</span>{% endif %}
+      </div>
+    </div>
+    <a href="{{ url_for('company_create_drive') }}" class="btn btn-primary">
+      <i class="bi bi-plus-lg me-1"></i>Create Drive
+    </a>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-sm-4">
+    <div class="stat-card stat-blue">
+      <div><div class="stat-value">{{ drives | length }}</div><div class="stat-label">Total Drives</div></div>
+      <i class="bi bi-briefcase stat-icon"></i>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="stat-card stat-green">
+      <div><div class="stat-value">{{ total_applicants }}</div><div class="stat-label">Total Applicants</div></div>
+      <i class="bi bi-people stat-icon"></i>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="stat-card stat-amber">
+      <div><div class="stat-value">{{ selected_count }}</div><div class="stat-label">Selected Students</div></div>
+      <i class="bi bi-person-check stat-icon"></i>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header px-4 py-3 d-flex justify-content-between align-items-center">
+    <span><i class="bi bi-briefcase me-2"></i>Your Placement Drives</span>
+    <a href="{{ url_for('company_drives') }}" class="btn btn-sm btn-outline-primary">Manage All</a>
+  </div>
+  <div class="card-body p-0">
+    {% if drives %}
+    <table class="table table-hover mb-0">
+      <thead><tr><th class="ps-4">Drive / Job Title</th><th>Deadline</th><th>Applicants</th><th>Status</th><th class="pe-4">Action</th></tr></thead>
+      <tbody>
+        {% for d in drives %}
+        <tr>
+          <td class="ps-4">
+            <div class="fw-semibold">{{ d.job_title }}</div>
+            <div class="text-muted" style="font-size:.78rem;">{{ d.drive_name }}</div>
+          </td>
+          <td>{{ d.application_deadline.strftime('%d %b %Y') if d.application_deadline else '—' }}</td>
+          <td><span class="badge bg-primary rounded-pill">{{ d.applications.count() }}</span></td>
+          <td><span class="status-badge badge-{{ d.status }}">{{ d.status | capitalize }}</span></td>
+          <td class="pe-4">
+            <a href="{{ url_for('company_drive_applications', drive_id=d.id) }}" class="btn btn-sm btn-outline-primary me-1">Applications</a>
+            {% if d.status != 'closed' %}
+            <a href="{{ url_for('company_edit_drive', drive_id=d.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="text-center text-muted py-5">
+      <i class="bi bi-briefcase" style="font-size:2rem;"></i>
+      <p class="mt-2">No drives yet. <a href="{{ url_for('company_create_drive') }}">Create your first drive</a>.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

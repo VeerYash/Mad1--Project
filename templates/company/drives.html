@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}My Drives — PlacementHub{% endblock %}
+{% block page_title %}My Placement Drives{% endblock %}
+
+{% block nav_links %}
+<a href="{{ url_for('company_dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+<div class="nav-sep"></div>
+<a href="{{ url_for('company_create_drive') }}"><i class="bi bi-plus-circle"></i> Create Drive</a>
+<a href="{{ url_for('company_drives') }}" class="active"><i class="bi bi-briefcase"></i> My Drives</a>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <span class="text-muted">{{ drives | length }} drive(s) total</span>
+  <a href="{{ url_for('company_create_drive') }}" class="btn btn-primary btn-sm">
+    <i class="bi bi-plus-lg me-1"></i>New Drive
+  </a>
+</div>
+<div class="row g-3">
+  {% for d in drives %}
+  <div class="col-md-6 col-xl-4">
+    <div class="card h-100">
+      <div class="card-body px-4 py-3">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <span class="status-badge badge-{{ d.status }}">{{ d.status | capitalize }}</span>
+          <span class="text-muted" style="font-size:.78rem;">{{ d.applications.count() }} applicant(s)</span>
+        </div>
+        <h6 class="fw-bold mb-1" style="font-family:'Syne',sans-serif;">{{ d.job_title }}</h6>
+        <p class="text-muted mb-2" style="font-size:.82rem;">{{ d.drive_name }}</p>
+        {% if d.location %}<div class="text-muted mb-1" style="font-size:.8rem;"><i class="bi bi-geo-alt me-1"></i>{{ d.location }}</div>{% endif %}
+        {% if d.salary %}<div class="text-muted mb-1" style="font-size:.8rem;"><i class="bi bi-currency-rupee me-1"></i>{{ d.salary }}</div>{% endif %}
+        {% if d.application_deadline %}<div class="text-muted mb-2" style="font-size:.8rem;"><i class="bi bi-calendar me-1"></i>{{ d.application_deadline.strftime('%d %b %Y') }}</div>{% endif %}
+      </div>
+      <div class="card-footer bg-transparent border-top d-flex gap-2 px-4 py-2">
+        <a href="{{ url_for('company_drive_applications', drive_id=d.id) }}" class="btn btn-sm btn-outline-primary flex-fill">Applications</a>
+        {% if d.status not in ('rejected', 'closed') %}
+          <a href="{{ url_for('company_edit_drive', drive_id=d.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+          <form method="POST" action="{{ url_for('company_delete_drive', drive_id=d.id) }}"
+                onsubmit="return confirm('Delete this drive?')" class="d-inline">
+            <button class="btn btn-sm btn-outline-danger">Delete</button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="col-12 text-center text-muted py-5">
+    <i class="bi bi-briefcase" style="font-size:2.5rem;"></i>
+    <p class="mt-2">No drives yet. <a href="{{ url_for('company_create_drive') }}">Create one!</a></p>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

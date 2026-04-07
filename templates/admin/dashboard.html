@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard — PlacementHub{% endblock %}
+{% block page_title %}Admin Dashboard{% endblock %}
+
+{% block nav_links %}
+<a href="{{ url_for('admin_dashboard') }}" class="active"><i class="bi bi-speedometer2"></i> Dashboard</a>
+<div class="nav-sep"></div>
+<a href="{{ url_for('admin_companies') }}"><i class="bi bi-building"></i> Companies</a>
+<a href="{{ url_for('admin_students') }}"><i class="bi bi-people"></i> Students</a>
+<a href="{{ url_for('admin_drives') }}"><i class="bi bi-briefcase"></i> Drives</a>
+<a href="{{ url_for('admin_applications') }}"><i class="bi bi-file-earmark-text"></i> Applications</a>
+<a href="{{ url_for('admin_analytics') }}"><i class="bi bi-bar-chart-line"></i> Analytics</a>
+{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card stat-blue">
+      <div><div class="stat-value">{{ stats.students }}</div><div class="stat-label">Total Students</div></div>
+      <i class="bi bi-people stat-icon"></i>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card stat-green">
+      <div><div class="stat-value">{{ stats.companies }}</div><div class="stat-label">Registered Companies</div></div>
+      <i class="bi bi-building stat-icon"></i>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card stat-amber">
+      <div><div class="stat-value">{{ stats.drives }}</div><div class="stat-label">Placement Drives</div></div>
+      <i class="bi bi-briefcase stat-icon"></i>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card stat-purple">
+      <div><div class="stat-value">{{ stats.applications }}</div><div class="stat-label">Total Applications</div></div>
+      <i class="bi bi-file-earmark-text stat-icon"></i>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header px-4 py-3 d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-building me-2 text-primary"></i>Pending Company Approvals</span>
+        <a href="{{ url_for('admin_companies') }}" class="btn btn-sm btn-outline-primary">View All</a>
+      </div>
+      <div class="card-body p-0">
+        {% if pending_companies %}
+        <table class="table table-hover mb-0">
+          <thead><tr><th class="ps-4">Company</th><th>HR Contact</th><th class="pe-4">Action</th></tr></thead>
+          <tbody>
+            {% for c in pending_companies %}
+            <tr>
+              <td class="ps-4">
+                <div class="fw-semibold">{{ c.company_name }}</div>
+                <div class="text-muted" style="font-size:.78rem;">{{ c.user.email }}</div>
+              </td>
+              <td>{{ c.hr_contact or '—' }}</td>
+              <td class="pe-4">
+                <form method="POST" action="{{ url_for('admin_company_action', company_id=c.id) }}" class="d-inline">
+                  <input type="hidden" name="action" value="approve"/>
+                  <button class="btn btn-sm btn-success me-1">Approve</button>
+                </form>
+                <form method="POST" action="{{ url_for('admin_company_action', company_id=c.id) }}" class="d-inline">
+                  <input type="hidden" name="action" value="reject"/>
+                  <button class="btn btn-sm btn-danger">Reject</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="text-center text-muted py-4"><i class="bi bi-check-circle me-2"></i>No pending approvals</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header px-4 py-3 d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-briefcase me-2 text-warning"></i>Pending Drive Approvals</span>
+        <a href="{{ url_for('admin_drives') }}" class="btn btn-sm btn-outline-primary">View All</a>
+      </div>
+      <div class="card-body p-0">
+        {% if pending_drives %}
+        <table class="table table-hover mb-0">
+          <thead><tr><th class="ps-4">Drive</th><th>Company</th><th class="pe-4">Action</th></tr></thead>
+          <tbody>
+            {% for d in pending_drives %}
+            <tr>
+              <td class="ps-4">
+                <div class="fw-semibold">{{ d.job_title }}</div>
+                <div class="text-muted" style="font-size:.78rem;">{{ d.drive_name }}</div>
+              </td>
+              <td>{{ d.company.company_name }}</td>
+              <td class="pe-4">
+                <form method="POST" action="{{ url_for('admin_drive_action', drive_id=d.id) }}" class="d-inline">
+                  <input type="hidden" name="action" value="approve"/>
+                  <button class="btn btn-sm btn-success me-1">Approve</button>
+                </form>
+                <form method="POST" action="{{ url_for('admin_drive_action', drive_id=d.id) }}" class="d-inline">
+                  <input type="hidden" name="action" value="reject"/>
+                  <button class="btn btn-sm btn-danger">Reject</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="text-center text-muted py-4"><i class="bi bi-check-circle me-2"></i>No pending drive approvals</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header px-4 py-3 d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-file-earmark-text me-2"></i>Recent Applications</span>
+        <a href="{{ url_for('admin_applications') }}" class="btn btn-sm btn-outline-primary">View All</a>
+      </div>
+      <div class="card-body p-0">
+        {% if recent_applications %}
+        <table class="table table-hover mb-0">
+          <thead><tr><th class="ps-4">Student</th><th>Drive</th><th>Company</th><th>Date</th><th class="pe-4">Status</th></tr></thead>
+          <tbody>
+            {% for app in recent_applications %}
+            <tr>
+              <td class="ps-4">{{ app.student.user.name }}</td>
+              <td>{{ app.drive.job_title }}</td>
+              <td>{{ app.drive.company.company_name }}</td>
+              <td>{{ app.applied_at.strftime('%d %b %Y') }}</td>
+              <td class="pe-4"><span class="status-badge badge-{{ app.status }}">{{ app.status | capitalize }}</span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="text-center text-muted py-4">No applications yet</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

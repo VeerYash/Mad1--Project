@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}My Applications — PlacementHub{% endblock %}
+{% block page_title %}My Applications{% endblock %}
+
+{% block nav_links %}
+<a href="{{ url_for('student_dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+<div class="nav-sep"></div>
+<a href="{{ url_for('student_drives') }}"><i class="bi bi-briefcase"></i> Browse Drives</a>
+<a href="{{ url_for('student_applications') }}" class="active"><i class="bi bi-file-earmark-text"></i> My Applications</a>
+<a href="{{ url_for('student_history') }}"><i class="bi bi-clock-history"></i> History</a>
+<div class="nav-sep"></div>
+<a href="{{ url_for('student_edit_profile') }}"><i class="bi bi-person-gear"></i> Edit Profile</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header px-4 py-3"><i class="bi bi-file-earmark-text me-2"></i>All My Applications</div>
+  <div class="card-body p-0">
+    {% if applications %}
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th class="ps-4">Drive</th><th>Company</th><th>Applied On</th><th>Interview Mode</th><th>Remark</th><th class="pe-4">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for app in applications %}
+        <tr>
+          <td class="ps-4">
+            <div class="fw-semibold">{{ app.drive.job_title }}</div>
+            <div class="text-muted" style="font-size:.78rem;">{{ app.drive.drive_name }}</div>
+          </td>
+          <td>{{ app.drive.company.company_name }}</td>
+          <td>{{ app.applied_at.strftime('%d %b %Y') }}</td>
+          <td>{{ app.interview_mode or '—' }}</td>
+          <td>{{ app.remark or '—' }}</td>
+          <td class="pe-4"><span class="status-badge badge-{{ app.status }}">{{ app.status | capitalize }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="text-center text-muted py-5">
+      <i class="bi bi-inbox" style="font-size:2.5rem;"></i>
+      <p class="mt-2">No applications yet. <a href="{{ url_for('student_drives') }}">Browse drives</a>.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

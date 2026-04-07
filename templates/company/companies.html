@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block title %}Companies — Admin{% endblock %}
+{% block page_title %}Manage Companies{% endblock %}
+
+{% block nav_links %}
+<a href="{{ url_for('admin_dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+<div class="nav-sep"></div>
+<a href="{{ url_for('admin_companies') }}" class="active"><i class="bi bi-building"></i> Companies</a>
+<a href="{{ url_for('admin_students') }}"><i class="bi bi-people"></i> Students</a>
+<a href="{{ url_for('admin_drives') }}"><i class="bi bi-briefcase"></i> Drives</a>
+<a href="{{ url_for('admin_applications') }}"><i class="bi bi-file-earmark-text"></i> Applications</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header px-4 py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <span><i class="bi bi-building me-2"></i>All Companies</span>
+    <form method="GET" class="d-flex gap-2">
+      <input type="text" name="q" value="{{ q or '' }}" class="form-control form-control-sm" placeholder="Search by name…" style="width:200px;"/>
+      <button class="btn btn-sm btn-primary">Search</button>
+      {% if q %}<a href="{{ url_for('admin_companies') }}" class="btn btn-sm btn-outline-secondary">Clear</a>{% endif %}
+    </form>
+  </div>
+  <div class="card-body p-0">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr><th class="ps-4">ID</th><th>Company</th><th>HR Contact</th><th>Website</th><th>Status</th><th class="pe-4">Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for c in companies %}
+        <tr>
+          <td class="ps-4 text-muted">#{{ c.id }}</td>
+          <td>
+            <div class="fw-semibold">{{ c.company_name }}</div>
+            <div class="text-muted" style="font-size:.78rem;">{{ c.user.email }}</div>
+          </td>
+          <td>{{ c.hr_contact or '—' }}</td>
+          <td>
+            {% if c.website %}
+              <a href="{{ c.website }}" target="_blank" class="text-decoration-none" style="font-size:.85rem;">{{ c.website[:30] }}…</a>
+            {% else %}—{% endif %}
+          </td>
+          <td><span class="status-badge badge-{{ c.approval_status }}">{{ c.approval_status | capitalize }}</span></td>
+          <td class="pe-4">
+            {% if c.approval_status == 'pending' %}
+              <form method="POST" action="{{ url_for('admin_company_action', company_id=c.id) }}" class="d-inline">
+                <input type="hidden" name="action" value="approve"/>
+                <button class="btn btn-sm btn-success">Approve</button>
+              </form>
+              <form method="POST" action="{{ url_for('admin_company_action', company_id=c.id) }}" class="d-inline ms-1">
+                <input type="hidden" name="action" value="reject"/>
+                <button class="btn btn-sm btn-danger">Reject</button>
+              </form>
+            {% elif c.approval_status != 'blacklisted' %}
+              <form method="POST" action="{{ url_for('admin_company_action', company_id=c.id) }}" class="d-inline">
+                <input type="hidden" name="action" value="blacklist"/>
+                <button class="btn btn-sm btn-dark">Blacklist</button>
+              </form>
+            {% else %}
+              <form method="POST" action="{{ url_for('admin_company_action', company_id=c.id) }}" class="d-inline">
+                <input type="hidden" name="action" value="approve"/>
+                <button class="btn btn-sm btn-outline-success">Restore</button>
+              </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-center text-muted py-4">No companies found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

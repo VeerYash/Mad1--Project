@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block title %}Edit Profile — PlacementHub{% endblock %}
+{% block page_title %}Edit Profile{% endblock %}
+
+{% block nav_links %}
+<a href="{{ url_for('student_dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+<div class="nav-sep"></div>
+<a href="{{ url_for('student_drives') }}"><i class="bi bi-briefcase"></i> Browse Drives</a>
+<a href="{{ url_for('student_applications') }}"><i class="bi bi-file-earmark-text"></i> My Applications</a>
+<a href="{{ url_for('student_history') }}"><i class="bi bi-clock-history"></i> History</a>
+<div class="nav-sep"></div>
+<a href="{{ url_for('student_edit_profile') }}" class="active"><i class="bi bi-person-gear"></i> Edit Profile</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card">
+      <div class="card-header px-4 py-3"><i class="bi bi-person-gear me-2"></i>Edit Profile</div>
+      <div class="card-body px-4 py-4">
+        <form method="POST" action="{{ url_for('student_edit_profile') }}" enctype="multipart/form-data">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Full Name</label>
+              <input type="text" name="name" class="form-control" value="{{ user.name }}" required/>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Email</label>
+              <input type="email" class="form-control" value="{{ user.email }}" disabled/>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">Age</label>
+              <input type="number" name="age" class="form-control" value="{{ student.age or '' }}" min="16" max="40"/>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">CGPA</label>
+              <input type="number" name="cgpa" class="form-control" step="0.01" min="0" max="10" value="{{ student.cgpa }}"/>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">Graduation Year</label>
+              <input type="number" name="graduation_year" class="form-control" value="{{ student.graduation_year or '' }}" min="2020" max="2030"/>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Department</label>
+              <input type="text" name="department" class="form-control" value="{{ student.department }}" required/>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Contact Info</label>
+              <input type="text" name="contact_info" class="form-control" value="{{ student.contact_info }}" required/>
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold">Skills <span class="text-muted fw-normal">(comma-separated)</span></label>
+              <input type="text" name="skills" class="form-control" placeholder="Python, SQL, Java…" value="{{ student.skills or '' }}"/>
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold">Resume <span class="text-muted fw-normal">(PDF only)</span></label>
+              {% if student.resume_path %}
+              <div class="mb-2">
+                <a href="{{ url_for('view_resume', student_id=student.id) }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                  <i class="bi bi-file-earmark-person me-1"></i>View Current Resume
+                </a>
+              </div>
+              {% endif %}
+              <input type="file" name="resume" class="form-control" accept=".pdf"/>
+            </div>
+            <div class="col-12 border-top pt-3">
+              <p class="fw-semibold mb-2">Change Password <span class="text-muted fw-normal">(leave blank to keep current)</span></p>
+              <div class="row g-2">
+                <div class="col-md-6">
+                  <input type="password" name="new_password" class="form-control" placeholder="New password"/>
+                </div>
+                <div class="col-md-6">
+                  <input type="password" name="confirm_password" class="form-control" placeholder="Confirm new password"/>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 d-flex gap-2">
+            <button type="submit" class="btn btn-primary px-4"><i class="bi bi-check-lg me-1"></i>Save Changes</button>
+            <a href="{{ url_for('student_dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

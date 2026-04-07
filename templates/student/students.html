@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}Students — Admin{% endblock %}
+{% block page_title %}Manage Students{% endblock %}
+
+{% block nav_links %}
+<a href="{{ url_for('admin_dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+<div class="nav-sep"></div>
+<a href="{{ url_for('admin_companies') }}"><i class="bi bi-building"></i> Companies</a>
+<a href="{{ url_for('admin_students') }}" class="active"><i class="bi bi-people"></i> Students</a>
+<a href="{{ url_for('admin_drives') }}"><i class="bi bi-briefcase"></i> Drives</a>
+<a href="{{ url_for('admin_applications') }}"><i class="bi bi-file-earmark-text"></i> Applications</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header px-4 py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <span><i class="bi bi-people me-2"></i>All Students</span>
+    <form method="GET" class="d-flex gap-2">
+      <input type="text" name="q" value="{{ q or '' }}" class="form-control form-control-sm" placeholder="Name, ID, contact…" style="width:220px;"/>
+      <button class="btn btn-sm btn-primary">Search</button>
+      {% if q %}<a href="{{ url_for('admin_students') }}" class="btn btn-sm btn-outline-secondary">Clear</a>{% endif %}
+    </form>
+  </div>
+  <div class="card-body p-0">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr><th class="ps-4">ID</th><th>Name</th><th>Department</th><th>CGPA</th><th>Contact</th><th>Status</th><th class="pe-4">Action</th></tr>
+      </thead>
+      <tbody>
+        {% for s in students %}
+        <tr>
+          <td class="ps-4 text-muted">#{{ s.id }}</td>
+          <td>
+            <div class="fw-semibold">{{ s.user.name }}</div>
+            <div class="text-muted" style="font-size:.78rem;">{{ s.user.email }}</div>
+          </td>
+          <td>{{ s.department }}</td>
+          <td>{{ s.cgpa }}</td>
+          <td>{{ s.contact_info }}</td>
+          <td>
+            {% if s.user.is_active %}
+              <span class="status-badge badge-approved">Active</span>
+            {% else %}
+              <span class="status-badge badge-rejected">Deactivated</span>
+            {% endif %}
+          </td>
+          <td class="pe-4">
+            <form method="POST" action="{{ url_for('admin_student_action', student_id=s.id) }}" class="d-inline">
+              {% if s.user.is_active %}
+                <input type="hidden" name="action" value="deactivate"/>
+                <button class="btn btn-sm btn-dark">Blacklist</button>
+              {% else %}
+                <input type="hidden" name="action" value="activate"/>
+                <button class="btn btn-sm btn-outline-success">Restore</button>
+              {% endif %}
+            </form>
+            <form method="POST" action="{{ url_for('admin_student_action', student_id=s.id) }}" class="d-inline ms-1"
+                  onsubmit="return confirm('Delete this student permanently?')">
+              <input type="hidden" name="action" value="delete"/>
+              <button class="btn btn-sm btn-outline-danger">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="text-center text-muted py-4">No students found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

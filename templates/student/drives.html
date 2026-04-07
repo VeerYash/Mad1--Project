@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Browse Drives — PlacementHub{% endblock %}
+{% block page_title %}Placement Drives{% endblock %}
+
+{% block nav_links %}
+<a href="{{ url_for('student_dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+<div class="nav-sep"></div>
+<a href="{{ url_for('student_drives') }}" class="active"><i class="bi bi-briefcase"></i> Browse Drives</a>
+<a href="{{ url_for('student_applications') }}"><i class="bi bi-file-earmark-text"></i> My Applications</a>
+<a href="{{ url_for('student_history') }}"><i class="bi bi-clock-history"></i> History</a>
+<div class="nav-sep"></div>
+<a href="{{ url_for('student_edit_profile') }}"><i class="bi bi-person-gear"></i> Edit Profile</a>
+{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+  {% for d in drives %}
+  <div class="col-md-6 col-xl-4">
+    <div class="card h-100">
+      <div class="card-body px-4 py-3">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div class="fw-semibold" style="font-size:.8rem;color:var(--primary);">{{ d.company.company_name }}</div>
+          {% if d.interview_mode %}<span class="badge bg-light text-dark" style="font-size:.72rem;">{{ d.interview_mode }}</span>{% endif %}
+        </div>
+        <h6 class="fw-bold mb-1" style="font-family:'Syne',sans-serif;">{{ d.job_title }}</h6>
+        <p class="text-muted mb-3" style="font-size:.82rem;">
+          {{ d.job_description[:120] + '…' if d.job_description and d.job_description|length > 120 else (d.job_description or '') }}
+        </p>
+        <div class="d-flex flex-wrap gap-2 mb-2" style="font-size:.8rem;">
+          {% if d.salary %}<span class="badge rounded-pill" style="background:#eff6ff;color:#1e40af;"><i class="bi bi-currency-rupee"></i> {{ d.salary }}</span>{% endif %}
+          {% if d.location %}<span class="badge rounded-pill" style="background:#f0fdf4;color:#166534;"><i class="bi bi-geo-alt"></i> {{ d.location }}</span>{% endif %}
+          {% if d.application_deadline %}<span class="badge rounded-pill" style="background:#fef3c7;color:#92400e;"><i class="bi bi-calendar"></i> {{ d.application_deadline.strftime('%d %b %Y') }}</span>{% endif %}
+        </div>
+        {% if d.eligibility_criteria %}
+        <div class="text-muted" style="font-size:.78rem;"><strong>Eligibility:</strong> {{ d.eligibility_criteria[:80] }}…</div>
+        {% endif %}
+      </div>
+      <div class="card-footer bg-transparent border-top px-4 py-2">
+        {% if d.id in applied_drive_ids %}
+          <div class="text-center py-1">
+            <span class="status-badge badge-applied">✓ Already Applied</span>
+          </div>
+        {% else %}
+          <form method="POST" action="{{ url_for('student_apply', drive_id=d.id) }}">
+            <button type="submit" class="btn btn-primary w-100">Apply Now</button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="col-12 text-center text-muted py-5">
+    <i class="bi bi-briefcase" style="font-size:2.5rem;"></i>
+    <p class="mt-2">No approved drives available at the moment.</p>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

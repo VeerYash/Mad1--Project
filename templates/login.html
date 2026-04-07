@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}Login — PlacementHub{% endblock %}
+
+{% block auth_content %}
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-logo">🎓 PlacementHub</div>
+    <p class="auth-sub">Sign in to your account</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ 'danger' if category=='danger' else ('warning' if category=='warning' else ('success' if category=='success' else 'info')) }} alert-dismissible fade show mb-3" role="alert">
+          {{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    {% endwith %}
+
+    <!-- Role selector -->
+    <div class="mb-4">
+      <label class="form-label fw-600">Login as</label>
+      <div class="d-flex gap-2">
+        <button type="button" class="role-btn btn btn-outline-primary flex-fill" data-role="student" id="btn-student">
+          <i class="bi bi-mortarboard me-1"></i> Student
+        </button>
+        <button type="button" class="role-btn btn btn-outline-primary flex-fill" data-role="company" id="btn-company">
+          <i class="bi bi-building me-1"></i> Company
+        </button>
+        <button type="button" class="role-btn btn btn-outline-primary flex-fill" data-role="admin" id="btn-admin">
+          <i class="bi bi-shield-lock me-1"></i> Admin
+        </button>
+      </div>
+    </div>
+
+    <form method="POST" action="{{ url_for('login') }}">
+      <input type="hidden" name="login_role" id="login-role-input" value=""/>
+      <div class="mb-3">
+        <label class="form-label fw-600">Email address</label>
+        <input type="email" name="email" class="form-control" placeholder="you@example.com" required autofocus/>
+      </div>
+      <div class="mb-4">
+        <label class="form-label fw-600">Password</label>
+        <input type="password" name="password" class="form-control" placeholder="••••••••" required/>
+      </div>
+      <button type="submit" class="btn btn-primary w-100 py-2 fw-600">Sign In</button>
+    </form>
+
+    <hr class="my-4"/>
+    <p class="text-center text-muted" style="font-size:.875rem;">
+      Don't have an account? <a href="{{ url_for('register') }}" class="text-decoration-none fw-600">Register here</a>
+    </p>
+  </div>
+</div>
+
+<style>
+  .role-btn { font-size: .82rem; padding: 8px 6px; transition: all .15s; }
+  .role-btn.active-role {
+    background: var(--primary) !important;
+    border-color: var(--primary) !important;
+    color: #fff !important;
+  }
+</style>
+
+<script>
+  const roleBtns = document.querySelectorAll('.role-btn');
+  const roleInput = document.getElementById('login-role-input');
+
+  roleBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      roleBtns.forEach(b => b.classList.remove('active-role'));
+      btn.classList.add('active-role');
+      roleInput.value = btn.dataset.role;
+    });
+  });
+</script>
+{% endblock %}

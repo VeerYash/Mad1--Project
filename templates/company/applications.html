@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Applications — Admin{% endblock %}
+{% block page_title %}All Applications{% endblock %}
+
+{% block nav_links %}
+<a href="{{ url_for('admin_dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+<div class="nav-sep"></div>
+<a href="{{ url_for('admin_companies') }}"><i class="bi bi-building"></i> Companies</a>
+<a href="{{ url_for('admin_students') }}"><i class="bi bi-people"></i> Students</a>
+<a href="{{ url_for('admin_drives') }}"><i class="bi bi-briefcase"></i> Drives</a>
+<a href="{{ url_for('admin_applications') }}" class="active"><i class="bi bi-file-earmark-text"></i> Applications</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header px-4 py-3"><i class="bi bi-file-earmark-text me-2"></i>All Applications</div>
+  <div class="card-body p-0">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr><th class="ps-4">Student</th><th>Drive</th><th>Company</th><th>Applied On</th><th>Interview</th><th class="pe-4">Status</th></tr>
+      </thead>
+      <tbody>
+        {% for app in applications %}
+        <tr>
+          <td class="ps-4">
+            <div class="fw-semibold">{{ app.student.user.name }}</div>
+            <div class="text-muted" style="font-size:.78rem;">{{ app.student.department }}</div>
+          </td>
+          <td>{{ app.drive.job_title }}</td>
+          <td>{{ app.drive.company.company_name }}</td>
+          <td>{{ app.applied_at.strftime('%d %b %Y') }}</td>
+          <td>{{ app.interview_mode or '—' }}</td>
+          <td class="pe-4"><span class="status-badge badge-{{ app.status }}">{{ app.status | capitalize }}</span></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-center text-muted py-4">No applications found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
